@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auros Bot 2.7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'auros-green': '#758348',
+                        'auros-gray': '#bcb6b1',
+                        'auros-white': '#fcfbfc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #758348 0%, #8fa357 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .command-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(117, 131, 72, 0.2);
+        }
+
+        .command-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(117, 131, 72, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .command-card:hover::after {
+            opacity: 1;
+        }
+
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #758348;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #758348, #8fa357);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #758348 0%, #8fa357 100%);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(117, 131, 72, 0.2);
+        }
+
+        .feature-card:hover .icon-circle {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .logo-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover img {
+            transform: scale(1.1);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #758348;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+        }
+
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            transform: translate(-50%, -50%) scale(2);
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .mobile-menu-active {
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        /* Dark mode styles */
+        .dark body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark .bg-white {
+            background-color: #2a2a2a;
+        }
+
+        .dark .text-gray-600 {
+            color: #9ca3af;
+        }
+
+        .dark .text-gray-900 {
+            color: #ffffff;
+        }
+
+        .dark .bg-white\/90 {
+            background-color: rgba(42, 42, 42, 0.9);
+        }
+
+        .dark .border-b {
+            border-color: #3a3a3a;
+        }
+
+        .dark .command-card .bg-white,
+        .dark .feature-card.bg-white {
+            background-color: #2a2a2a;
+        }
+
+        .dark .from-gray-50 {
+            --tw-gradient-from: #1a1a1a;
+        }
+
+        .dark .to-white {
+            --tw-gradient-to: #2a2a2a;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            padding: 0.5rem;
+            border-radius: 9999px;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(156, 163, 175, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-auros-white text-gray-900">
+    <!-- Header -->
+    <header class="fixed w-full top-0 bg-white/90 backdrop-blur-sm z-50 border-b">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="logo-container float-animation">
+                    <img src="auros.png" alt="Auros Logo" class="w-full h-full">
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-6">
+                <a href="#comandos" class="nav-link text-gray-600 hover:text-auros-green">Comandos</a>
+                <a href="#recursos" class="nav-link text-gray-600 hover:text-auros-green">Recursos</a>
+                <a href="https://github.com/Aurosnet" target="_blank" class="nav-link text-gray-600 hover:text-auros-green">
+                    GitHub
+                </a>
+                <a href="https://top.gg/bot/1324491942125506590" target="_blank" class="nav-link text-gray-600 hover:text-auros-green">
+                    Top.gg
+                </a>
+                <button onclick="toggleTheme()" class="theme-toggle text-gray-600 hover:text-auros-green">
+                    <svg id="theme-toggle-dark-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </button>
+                <a href="https://discord.com/oauth2/authorize?client_id=1324491942125506590" target="_blank" 
+                   class="cta-button bg-auros-green text-white px-6 py-2 rounded-full hover:bg-opacity-90">
+                    Adicionar ao Discord
+                </a>
+            </div>
+            <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-4 py-2 border-t bg-white">
+            <a href="#comandos" class="block py-2 text-gray-600 hover:text-auros-green">Comandos</a>
+            <a href="#recursos" class="block py-2 text-gray-600 hover:text-auros-green">Recursos</a>
+            <a href="https://github.com/Aurosnet" target="_blank" class="block py-2 text-gray-600 hover:text-auros-green">GitHub</a>
+            <a href="https://top.gg/bot/1324491942125506590" target="_blank" class="block py-2 text-gray-600 hover:text-auros-green">Top.gg</a>
+            <button onclick="toggleTheme()" class="block w-full py-2 text-left text-gray-600 hover:text-auros-green">
+                Alternar Tema
+            </button>
+            <a href="https://discord.com/oauth2/authorize?client_id=1324491942125506590" target="_blank"
+               class="block mt-2 bg-auros-green text-white px-4 py-2 rounded-full hover:bg-opacity-90 text-center">
+                Adicionar ao Discord
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center" data-aos="fade-up">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Auros Bot 2.7</h1>
+            <p class="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8">
+                Um bot Discord completo com sistema de tickets, moderação e muito mais!
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="https://discord.com/oauth2/authorize?client_id=1324491942125506590" target="_blank"
+                   class="cta-button bg-white text-auros-green px-8 py-3 rounded-full hover:bg-opacity-90 transition-all">
+                    Adicionar ao Discord
+                </a>
+                <a href="https://top.gg/bot/1324491942125506590" target="_blank"
+                   class="cta-button border-2 border-white text-white px-8 py-3 rounded-full hover:bg-white hover:text-auros-green transition-all">
+                    Votar no Top.gg
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comandos Section -->
+    <section id="comandos" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">Comandos</h2>
+            
+            <!-- Filtros -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8" data-aos="fade-up">
+                <button onclick="filterCommands('all')" class="filter-btn active px-6 py-2 rounded-full bg-auros-green text-white hover:bg-opacity-90 transition-all">
+                    Todos
+                </button>
+                <button onclick="filterCommands('admin')" class="filter-btn px-6 py-2 rounded-full border border-auros-green text-auros-green hover:bg-auros-green hover:text-white transition-all">
+                    Administração
+                </button>
+                <button onclick="filterCommands('owner')" class="filter-btn px-6 py-2 rounded-full border border-auros-green text-auros-green hover:bg-auros-green hover:text-white transition-all">
+                    Proprietário
+                </button>
+            </div>
+
+            <!-- Grade de Comandos -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Comandos Gerais -->
+                <div class="command-card all" data-aos="fade-up">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/avatar</h3>
+                        <p class="text-gray-600">Veja o avatar de um usuário</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/help</h3>
+                        <p class="text-gray-600">Lista de comandos</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/userinfo</h3>
+                        <p class="text-gray-600">Obter informações de um usuário</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/serverinfo</h3>
+                        <p class="text-gray-600">Obter informações do servidor</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/embed</h3>
+                        <p class="text-gray-600">Criar um embed customizado</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/embedjson</h3>
+                        <p class="text-gray-600">Criar embed a partir de JSON</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/ping</h3>
+                        <p class="text-gray-600">Verificar a latência do bot</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/fecharticket</h3>
+                        <p class="text-gray-600">Fecha o ticket do chat que o comando foi usado</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/vantagens</h3>
+                        <p class="text-gray-600">Mostra as vantagens de votar no bot</p>
+                    </div>
+                </div>
+
+                <div class="command-card all" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/wikipedia</h3>
+                        <p class="text-gray-600">Pesquisa na Wikipedia</p>
+                    </div>
+                </div>
+
+
+                <!-- Comandos Admin -->
+                <div class="command-card admin hidden" data-aos="fade-up">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/ticket</h3>
+                        <p class="text-gray-600">Criar um painel de tickets</p>
+                    </div>
+                </div>
+
+                <div class="command-card admin hidden" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/adminpanel</h3>
+                        <p class="text-gray-600">Menu com configurações de moderação</p>
+                    </div>
+                </div>
+
+                <!-- Comandos Owner -->
+                <div class="command-card owner hidden" data-aos="fade-up">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/say</h3>
+                        <p class="text-gray-600">Faça o bot dizer algo (Apenas Proprietário)</p>
+                    </div>
+                </div>
+
+                <div class="command-card owner hidden" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-mono text-lg font-bold text-auros-green mb-2">/slashdelete</h3>
+                        <p class="text-gray-600">Deletar um comando (Apenas Proprietário)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recursos Section -->
+    <section id="recursos" class="py-16 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold mb-4">Recursos Principais</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Descubra as ferramentas poderosas que o Auros Bot oferece para melhorar seu servidor Discord
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Sistema de Tickets -->
+                <div class="feature-card bg-white p-6 rounded-xl" data-aos="fade-up">
+                    <div class="icon-circle">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-auros-green mb-3">Sistema de Tickets</h3>
+                    <p class="text-gray-600 mb-4">Sistema completo para gerenciamento de suporte com Categorização Customizada.</p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Categorização Customizada
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Transcrição completa
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Embeds Personalizados -->
+                <div class="feature-card bg-white p-6 rounded-xl" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-circle">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-auros-green mb-3">Embeds Personalizados</h3>
+                    <p class="text-gray-600 mb-4">Crie embeds profissionais usando comandos simples ou JSON.</p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Editor visual intuitivo
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Suporte a JSON
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Moderação -->
+                <div class="feature-card bg-white p-6 rounded-xl" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-circle">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-auros-green mb-3">Moderação Avançada</h3>
+                    <p class="text-gray-600 mb-4">Ferramentas poderosas para manter seu servidor seguro.</p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Sistema anti-spam (WIP)
+                        </li>
+                </div>
+
+                <!-- Utilidades -->
+                <div class="feature-card bg-white p-6 rounded-xl" data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon-circle">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-auros-green mb-3">Utilidades</h3>
+                    <p class="text-gray-600 mb-4">Comandos úteis para melhorar a experiência do servidor.</p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Pesquisa na Wikipedia
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Sistema de votos
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-auros-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Informações do servidor
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center gap-6 mb-8">
+                <a href="https://github.com/Aurosnet" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                    GitHub
+                </a>
+                <a href="https://top.gg/bot/1324491942125506590" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                    Top.gg
+                </a>
+                <a href="https://discord.com/oauth2/authorize?client_id=1324491942125506590" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                    Discord
+                </a>
+            </div>
+            <p class="text-gray-400">© 2024 Auros Bot. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // Theme toggle functionality using vanilla JavaScript
+        function toggleTheme() {
+            const html = document.documentElement;
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                darkIcon.classList.remove('hidden');
+                lightIcon.classList.add('hidden');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                darkIcon.classList.add('hidden');
+                lightIcon.classList.remove('hidden');
+            }
+        }
+
+        // Check for saved theme preference on load
+        const savedTheme = localStorage.getItem('theme');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            darkIcon.classList.add('hidden');
+            lightIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
+        }
+
+        // Filter commands using vanilla JavaScript
+        function filterCommands(category) {
+            const cards = document.querySelectorAll('.command-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-auros-green', 'text-white');
+                btn.classList.add('border', 'border-auros-green', 'text-auros-green');
+            });
+            event.target.classList.remove('border', 'border-auros-green', 'text-auros-green');
+            event.target.classList.add('bg-auros-green', 'text-white');
+
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.classList.remove('hidden');
+                    card.classList.add('scroll-reveal');
+                    setTimeout(() => card.classList.add('active'), 100);
+                } else {
+                    if (card.classList.contains(category)) {
+                        card.classList.remove('hidden');
+                        card.classList.add('scroll-reveal');
+                        setTimeout(() => card.classList.add('active'), 100);
+                    } else {
+                        card.classList.add('hidden');
+                        card.classList.remove('scroll-reveal', 'active');
+                    }
+                }
+            });
+        }
+
+        // Mobile menu toggle using vanilla JavaScript
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('mobile-menu-active');
+            }
+        }
+
+        // Smooth scroll using vanilla JavaScript
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
